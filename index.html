@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Smart Mirror Uhr + Wetter</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#container {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+#clock {
+    font-size: 96px;
+    font-weight: 700;
+}
+
+#date {
+    margin-top: 10px;
+    font-size: 32px;
+}
+
+#weather {
+    margin-top: 15px;
+    font-size: 28px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="container">
+    <div id="clock">--:--:--</div>
+    <div id="date">--</div>
+    <div id="weather">Wetter lädt…</div>
+</div>
+
+<script>
+// ===== UHR + DATUM =====
+var months = [
+    "Januar","Februar","März","April","Mai","Juni",
+    "Juli","August","September","Oktober","November","Dezember"
+];
+
+function updateClock() {
+    var now = new Date();
+
+    var h = now.getHours();
+    var m = now.getMinutes();
+    var s = now.getSeconds();
+
+    if (h < 10) h = "0" + h;
+    if (m < 10) m = "0" + m;
+    if (s < 10) s = "0" + s;
+
+    document.getElementById("clock").innerHTML = h + ":" + m + ":" + s;
+
+    document.getElementById("date").innerHTML =
+        now.getDate() + " " +
+        months[now.getMonth()] + " " +
+        now.getFullYear();
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+// ===== WETTER =====
+function weatherIcon(code) {
+    // Klarer Himmel
+    if (code === 0) return "☀️";
+    // Wenig Wolken / teilweise Sonne
+    if (code === 1) return "🌤️";
+    if (code === 2) return "⛅";
+    // Bewölkt
+    if (code === 3) return "☁️";
+    // Nebel / Dunst
+    if (code >= 45 && code <= 48) return "🌫️";
+    // Nieselregen / leichter Regen
+    if (code >= 51 && code <= 57) return "🌦️";
+    // Regen
+    if (code >= 61 && code <= 67) return "🌧️";
+    // Schneefall
+    if (code >= 71 && code <= 77) return "❄️";
+    // Gewitter / starker Regen
+    if (code >= 95 && code <= 99) return "⛈️";
+    // Fallback
+    return "?";
+}
+
+function loadWeather() {
+    try {
+        var xhr = new XMLHttpRequest();
+        var url =
+            "https://api.open-meteo.com/v1/forecast" +
+            "?latitude=48.2167&longitude=8.4333&current_weather=true";
+
+        xhr.open("GET", url, true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var temp = Math.round(data.current_weather.temperature);
+                var icon = weatherIcon(data.current_weather.weathercode);
+                document.getElementById("weather").innerHTML =
+                    icon + " " + temp + " °C";
+            } else {
+                document.getElementById("weather").innerHTML =
+                    "Wetterfehler";
+            }
+        };
+
+        xhr.onerror = function () {
+            document.getElementById("weather").innerHTML =
+                "Wetter offline";
+        };
+
+        xhr.send();
+    } catch (e) {
+        document.getElementById("weather").innerHTML =
+            "Wetter nicht verfügbar";
+    }
+}
+
+loadWeather();
+setInterval(loadWeather, 600000); // alle 10 Minuten
+</script>
+
+</body>
+</html>
