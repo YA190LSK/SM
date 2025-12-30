@@ -29,17 +29,18 @@ html, body {
 #date {
     margin-top: 10px;
     font-size: 32px;
+    text-align: center;     /* NEU */
 }
 
 #weather {
     margin-top: 15px;
-    font-size: 28px;
+    font-size: 36px;        /* GRÖSSER */
+    text-align: center;     /* NEU */
 }
 </style>
 </head>
 
 <body>
-
 <div id="container">
     <div id="clock">--:--:--</div>
     <div id="date">--</div>
@@ -55,7 +56,6 @@ var months = [
 
 function updateClock() {
     var now = new Date();
-
     var h = now.getHours();
     var m = now.getMinutes();
     var s = now.getSeconds();
@@ -65,11 +65,8 @@ function updateClock() {
     if (s < 10) s = "0" + s;
 
     document.getElementById("clock").innerHTML = h + ":" + m + ":" + s;
-
     document.getElementById("date").innerHTML =
-        now.getDate() + " " +
-        months[now.getMonth()] + " " +
-        now.getFullYear();
+        now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
 }
 
 updateClock();
@@ -77,33 +74,23 @@ setInterval(updateClock, 1000);
 
 // ===== WETTER =====
 function weatherIcon(code) {
-    // Klarer Himmel
     if (code === 0) return "☀️";
-    // Wenig Wolken / teilweise Sonne
     if (code === 1) return "🌤️";
     if (code === 2) return "⛅";
-    // Bewölkt
     if (code === 3) return "☁️";
-    // Nebel / Dunst
     if (code >= 45 && code <= 48) return "🌫️";
-    // Nieselregen / leichter Regen
     if (code >= 51 && code <= 57) return "🌦️";
-    // Regen
     if (code >= 61 && code <= 67) return "🌧️";
-    // Schneefall
     if (code >= 71 && code <= 77) return "❄️";
-    // Gewitter / starker Regen
     if (code >= 95 && code <= 99) return "⛈️";
-    // Fallback
     return "?";
 }
 
 function loadWeather() {
     try {
         var xhr = new XMLHttpRequest();
-        var url =
-            "https://api.open-meteo.com/v1/forecast" +
-            "?latitude=48.2167&longitude=8.4333&current_weather=true";
+        var url = "https://api.open-meteo.com/v1/forecast"
+            + "?latitude=48.2167&longitude=8.4333&current_weather=true";
 
         xhr.open("GET", url, true);
 
@@ -115,26 +102,24 @@ function loadWeather() {
                 document.getElementById("weather").innerHTML =
                     icon + " " + temp + " °C";
             } else {
-                document.getElementById("weather").innerHTML =
-                    "Wetterfehler";
+                document.getElementById("weather").innerHTML = "Wetterfehler";
             }
         };
 
         xhr.onerror = function () {
-            document.getElementById("weather").innerHTML =
-                "Wetter offline";
+            document.getElementById("weather").innerHTML = "Wetter offline";
         };
 
         xhr.send();
     } catch (e) {
-        document.getElementById("weather").innerHTML =
-            "Wetter nicht verfügbar";
+        document.getElementById("weather").innerHTML = "Wetter nicht verfügbar";
     }
 }
 
 loadWeather();
-setInterval(loadWeather, 600000); // alle 10 Minuten
+setInterval(loadWeather, 600000);
 </script>
-
 </body>
 </html>
+
+
