@@ -83,7 +83,7 @@ function weatherIcon(code) {
     if (code >= 61 && code <= 67) return "🌧️";
     if (code >= 71 && code <= 77) return "❄️";
     if (code >= 95 && code <= 99) return "⛈️";
-    return "?";
+    return "";
 }
 
 function loadWeather() {
@@ -121,5 +121,6 @@ setInterval(loadWeather, 600000);
 </script>
 </body>
 </html>
+
 
 
